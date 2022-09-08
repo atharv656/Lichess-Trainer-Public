@@ -5,6 +5,7 @@ import berserk
 
 session = berserk.TokenSession("lip_DcekuZBitKMSNtho2eJN")
 client = berserk.Client(session=session)
+# user = berserk.Users(session=session)
 
 start = berserk.utils.to_millis(datetime(2021, 9, 1))
 end = berserk.utils.to_millis(datetime(2022, 6, 25))
@@ -17,7 +18,7 @@ games = list(
         rated=True, 
         perf_type="rapid",
         opening=True,
-        max=200)
+        max=20)
     )
 
 openingTable = {}
@@ -79,6 +80,7 @@ for i in range(len(openings)):
     
 print("Best scored opening: ", runningMax, weightedScores[runningMax])
 print("Worst scored opening: ", runningMin, weightedScores[runningMin])
+
 
 # for i in range(10):
 #     opening = openings[i]
