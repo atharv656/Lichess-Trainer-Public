@@ -1,87 +1,119 @@
-from datetime import datetime
+from datetime import datetime, date
 import math
 from Opening import Opening
 import berserk
 
-session = berserk.TokenSession("lip_DcekuZBitKMSNtho2eJN")
-client = berserk.Client(session=session)
-# user = berserk.Users(session=session)
+def sortOpenings(games):
+    #Create frequency table of openings, win/loss rate and depth
+    openingTable = {}
+    openingScore = {}
+    openingDepth = {}
+    ecoMap = {}
 
-start = berserk.utils.to_millis(datetime(2021, 9, 1))
-end = berserk.utils.to_millis(datetime(2022, 6, 25))
+    for game in games:
+        opening = game['opening']
+        # print(opening)
+        name = opening['eco']
+        if name not in openingTable:
+            openingTable[name] = 0
+            openingScore[name] = 0
+            openingDepth[name] = 0
+            ecoMap[name] = opening['name']
 
-games = list(
-    client.games.export_by_player(
-        'redchess656', 
-        since=start, 
-        until=end, 
-        rated=True, 
-        perf_type="rapid",
-        opening=True,
-        max=20)
-    )
+        openingTable[name] += 1
+        openingDepth[name] = max(openingDepth[name], opening['ply'])
 
-openingTable = {}
-openingScore = {}
-openingDepth = {}
-
-for game in games:
-    opening = game['opening']
-    # print(opening)
-    name = opening['name']
-    if name not in openingTable:
-        openingTable[name] = 0
-        openingScore[name] = 0
-        openingDepth[name] = 0
-
-    openingTable[name] += 1
-    openingDepth[name] = max(openingDepth[name], opening['ply'])
-
-    if 'winner' in game:
-        if game['players'][game['winner']]['user']['name']=='redchess656':
-            openingScore[name] += 1 
+        if 'winner' in game:
+            if game['players'][game['winner']]['user']['name']=='redchess656':
+                openingScore[name] += 1 
+            # else:
+            #     openingScore[name] -= 1 
         else:
-            openingScore[name] -= 1 
+            openingScore[name] += 0.5
 
 
+    #Create a score for each opening based on its win/loss rate and depth
+    weightedScores = {'max' : 0, 'min' : 1}
+    runningMax = 'max'
+    runningMin = 'min'
+    openings = []
+    minDepth = 5
 
-# print("Freq table: ")
-# print(openingTable)
+    for key in openingTable.keys():
+        if openingTable[key] < minDepth:
+            continue
+        weightedScore = openingScore[key] / openingTable[key]
+        weightedScores[key] = weightedScore
 
-# print("Depth table:")
-# print(openingDepth)
+        if weightedScore > weightedScores[runningMax]:
+            runningMax = key
 
-# print("Score table:")
-# print(openingScore)
+        if weightedScore < weightedScores[runningMin]:
+            runningMin = key
 
-weightedScores = {'' : 0}
-runningMax = ''
-runningMin = ''
-openings = []
-minDepth = 5
+        #Store the data in an opening object
+        openings.append(Opening(key, openingTable[key], openingScore[key], openingDepth[key], weightedScore))
 
-for key in openingTable.keys():
-    weightedScore = openingScore[key] / openingTable[key] +  math.copysign(openingTable[key]/pow(10, len(str(openingTable[key]))), openingScore[key])
-    weightedScores[key] = weightedScore
+    #Sort the openings by weighted score
+    return sorted(openings), ecoMap
 
-    if weightedScore > weightedScores[runningMax]:
-        runningMax = key
+def scoreOpenings():
+    #Set up api
+    session = berserk.TokenSession("lip_DcekuZBitKMSNtho2eJN")
+    client = berserk.Client(session=session)
 
-    if weightedScore < weightedScores[runningMin]:
-        runningMin = key
+    #Load last 20 games
+    today = str(date.today()).split("-")
+    today = [int(num) for num in today]
 
-    openings.append(Opening(key, openingTable[key], openingScore[key], openingDepth[key], weightedScore))
+    start = berserk.utils.to_millis(datetime(2022, 1, 1))
+    end = berserk.utils.to_millis(datetime(today[0], today[1], today[2]))
 
-openings = sorted(openings)
+    whiteGames = list(
+        client.games.export_by_player(
+            'redchess656', 
+            since=start, 
+            until=end, 
+            rated=True, 
+            perf_type="rapid",
+            color="white",
+            opening=True,
+            max=100)
+        )
 
-for i in range(len(openings)):
-    opening = openings[i]
-    print(i, " ", opening, " ", opening.depth, opening.weightedScore)
+    blackGames = list(
+        client.games.export_by_player(
+            'redchess656', 
+            since=start, 
+            until=end, 
+            rated=True, 
+            perf_type="rapid",
+            color="black",
+            opening=True,
+            max=100)
+        )
+
+    white, whiteEco = sortOpenings(whiteGames)
+    black, blackEco = sortOpenings(blackGames)
+    whiteEco.update(blackEco)
+
+    return(white, black, whiteEco)
+
+# Testcase prints
+# white, black, ecoMap = scoreOpenings()
+# print(ecoMap[white[0].name], ecoMap[black[0].name])
+
+#Print the best/worst openings
+# for i in range(len(white)):
+#     opening = white[i]
+#     print(i, " ", opening, " ", ecoMap[opening.name], " ", opening.depth, opening.weightedScore)
     
-print("Best scored opening: ", runningMax, weightedScores[runningMax])
-print("Worst scored opening: ", runningMin, weightedScores[runningMin])
+# print("Best scored opening: ", white[-1])
+# print("Worst scored opening: ", white[0])
 
-
-# for i in range(10):
-#     opening = openings[i]
-#     print(i+1, " ", opening, " ", opening.depth)
+# for i in range(len(black)):
+#     opening = black[i]
+#     print(i, " ", opening, " ", ecoMap[opening.name], " ", opening.depth, opening.weightedScore)
+    
+# print("Best scored opening: ", black[-1])
+# print("Worst scored opening: ", black[0])
