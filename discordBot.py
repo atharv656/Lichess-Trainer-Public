@@ -9,7 +9,7 @@ import sys
 intents = discord.Intents.default()
 intents.members = True
 
-client = discord.Client()
+client = discord.Client(intents = intents)
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 file = open('userList.pkl', 'rb')
