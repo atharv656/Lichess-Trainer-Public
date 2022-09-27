@@ -65,12 +65,18 @@ async def sendDailyPuzzles():
         user = await bot.fetch_user(id)
         channel = await user.create_dm()
         white, black = puzzleRec.getPuzzles()
-        whiteMessage = discord.Embed(title=f"White to play: {white[0]}", description=white)
-        blackMessage = discord.Embed(title=f"Black to play: {black[0]}", description=black)
         
         await channel.send(f"Hey {user.name}, here are your puzzles for today!")
-        await channel.send(embed=whiteMessage)
-        await channel.send(embed=blackMessage)
+        await channel.send(f"White: {white[0]} {white[1]}")
+        await channel.send(f"Black: {black[0]} {black[1]}")
+        print(white)
+        print(black)
+        
+        # whiteMessage = discord.Embed(title=f"White to play: {white[0]}", description=white)
+        # blackMessage = discord.Embed(title=f"Black to play: {black[0]}", description=black)
+
+        # await channel.send(embed=whiteMessage)
+        # await channel.send(embed=blackMessage)
 
 def test():
     print("test")
