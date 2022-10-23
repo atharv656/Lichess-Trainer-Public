@@ -1,5 +1,4 @@
 from datetime import datetime, date
-import math
 from Opening import Opening
 import berserk
 
@@ -8,31 +7,32 @@ def sortOpenings(games):
     openingTable = {}
     openingScore = {}
     openingDepth = {}
-    ecoMap = {}
+    ecoMap = {}     # Map opening names to eco codes
 
     for game in games:
         opening = game['opening']
-        # print(opening)
         name = opening['eco']
+
+        # If this opening has not been seen before, add it to the tables
         if name not in openingTable:
             openingTable[name] = 0
             openingScore[name] = 0
             openingDepth[name] = 0
             ecoMap[name] = opening['name']
 
+        # Update the tables
         openingTable[name] += 1
         openingDepth[name] = max(openingDepth[name], opening['ply'])
 
+        # Update opening scores
         if 'winner' in game:
             if game['players'][game['winner']]['user']['name']=='redchess656':
                 openingScore[name] += 1 
-            # else:
-            #     openingScore[name] -= 1 
         else:
             openingScore[name] += 0.5
 
 
-    #Create a score for each opening based on its win/loss rate and depth
+    #Create a score for each opening based on its win percentage and depth
     weightedScores = {'max' : 0, 'min' : 1}
     runningMax = 'max'
     runningMin = 'min'
@@ -40,14 +40,17 @@ def sortOpenings(games):
     minDepth = 5
 
     for key in openingTable.keys():
+        # There must be enough games played for the data to be valid
         if openingTable[key] < minDepth:
             continue
+
+        # Calculate the win percentage
         weightedScore = openingScore[key] / openingTable[key]
         weightedScores[key] = weightedScore
 
+        # Update the running max and min
         if weightedScore > weightedScores[runningMax]:
             runningMax = key
-
         if weightedScore < weightedScores[runningMin]:
             runningMin = key
 
@@ -62,7 +65,7 @@ def scoreOpenings():
     session = berserk.TokenSession("lip_DcekuZBitKMSNtho2eJN")
     client = berserk.Client(session=session)
 
-    #Load last 20 games
+    #Load last 100 games for white and black (that were played after Jan 1, 2022)
     today = str(date.today()).split("-")
     today = [int(num) for num in today]
 
@@ -93,8 +96,11 @@ def scoreOpenings():
             max=100)
         )
 
+    # Sort the openings
     white, whiteEco = sortOpenings(whiteGames)
     black, blackEco = sortOpenings(blackGames)
+
+    # Combine the eco maps to have a single map from opening name to eco code
     whiteEco.update(blackEco)
 
     return(white, black, whiteEco)
