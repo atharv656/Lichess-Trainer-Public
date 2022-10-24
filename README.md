@@ -11,6 +11,8 @@ I started off by finding an API that let me get data on all of the online games 
 <br />
 Now, I've made a Discord Channel where people can join and provide their Lichess account to the bot. Every morning (using GitHub Actions), the bot will go through the list of lichess accounts, scrape their last 100 games, and send them a Lichess tactics link personalized to their worst scoring openings for White and Black.
 
+<img width="1199" alt="The Lichess Gym Discord Channel Where People Can Join For Personalized Tactics" src="https://user-images.githubusercontent.com/95951574/197459526-426ce308-8ce5-44a1-938d-4a4e8b128c90.png">
+
 
 ## Future Goals
 This project was initially meant for me to improve my chess game. It was originally just the LichessHandler.py file which I would run in terminal and then look up tactics for manually. I ralized if I wanted to use this regularly or for my friends to be able to try it out I'd need to make a more robust UI, so I developed the Discord Bot and used GitHub Actions to send the tactics daily. I also created a Discord Guild where others can join and gain access to the bot. I am currently developing editing a couple things to make the bot fully usable for others as well including: <br />
