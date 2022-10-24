@@ -21,3 +21,8 @@ This project was initially meant for me to improve my chess game. It was origina
 - Check if the window of games played (or any other variables) should be changed
 
 ## Video of it Running
+
+https://user-images.githubusercontent.com/95951574/197458473-dfae6a61-b123-4f92-af93-64ec860c768a.mov
+
+In this video, I start off by manually starting the github action that normally runs automatically every morning. I then show the daily messages I've been receiving since I built this bot. We can then see the github action has been queued and is running. After the action is completed we can see we got new notifications in discord, from the bot which has just sent us fresh Lichess links based on our last 100 games (since I've been doing a lot of coding recently and not a lot of chess playing, my worst openings happen to not have changed). I think click on both links and we can see they take us to opening-specific tactics pages (we see this in both the url and the bottom left corner where Lichess displays their tactic tags). And in the end, I forget I'm recording for a second as I start thinking of solutions to the puzzles!
+
