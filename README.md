@@ -1,5 +1,7 @@
 # Chess Trainer
 
+Note: In order to keep the discord key private, I have cloned this repository and deleted the discord bot token from discordbot.py — all the rest of the code is identical and when a valid discord bot token is used, the code would run identically to my private repo 
+
 ## Inspiration
 My dad taught me and my brother how to play chess when we were just kids. At first, the only opening I knew was the 4-move checkmate and after my brother learned a few openings of his own, including one that countered my 4-move mate, I realized I need to expand my repertoire. But learning chess openings is hard—it requires research and studying to memorize a precise sequence of moves that can only be used if your opponent plays into it. I never found this interesting, so I didn’t get back into chess until very recently. I’ve gotten much better at chess since then, but I’ve still never bothered to learn openings and in an effort to justify my stubbornness, this became my focus in the API Challenge. 
 
